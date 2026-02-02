@@ -1,11 +1,12 @@
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, desc
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 from core.schemas import Chat as ChatORM
 from core.schemas import Message as MessageORM
 from core.models import Chat, Message
-from typing import Optional
+from typing import Optional, List
 
 async def create_chat(chat: ChatORM, session: AsyncSession) -> Optional[Chat]:
     try:
@@ -31,12 +32,14 @@ async def create_message(chat_id:int, message: MessageORM, session: AsyncSession
         return None
     
     
-async def get_message(chat_id:int, limit: int, session: AsyncSession) -> Optional[Message]:
+async def get_list_messages(chat_id:int, limit: int, session: AsyncSession) -> Optional[List[Message]]:
     try:
-        stmt = select(Chat).where(Chat.id==chat_id).joined("Messages")
-        messages = await session.scalars(stmt)
-        print(messages)
-        return messages
+        stmt = select(Message).where(Message.chat_id == chat_id).order_by(desc(Message.created_at)).limit(limit)
+        messages = await session.execute(stmt)
+        result = messages.scalars().all()
+        print(result)
+        
+        return result
     except IntegrityError:
         await session.rollback()
         return None
