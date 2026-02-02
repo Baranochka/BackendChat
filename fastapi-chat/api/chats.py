@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import Field
+from typing import Optional
 from core import settings
 from core.schemas import Chat, Message
 from core.models import db_helper
-from crud import create_chat, create_message, get_message
+from crud import create_chat, create_message, get_list_messages, get_chat
 router = APIRouter(prefix=settings.api.chats)
 
 @router.post("/")
@@ -31,7 +32,28 @@ async def create_messages(
 @router.get("/{id}")
 async def get_messages(
     id: int,
-    limit: int = Field(default=20, gt=0, le=100),
+    limit: Optional[int] = Query(
+        default=20,
+        ge=1,
+        le=100,
+    ),
     session: AsyncSession = Depends(db_helper.session_getter)
 ):
-    result = await get_message(chat_id=id, limit=limit, session=session)
+    chat = await get_chat(chat_id=id,  session=session)
+    
+    result = await get_list_messages(chat_id=id, limit=limit, session=session)
+    list_messages = []
+    for message in result:
+        list_messages.append({
+                "id": message.id,
+                "text": message.text,
+                "created_at": message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            })
+    response = {
+        "Chat": "",
+        "id": chat.id,
+        "title": chat.title,
+        "created_at": chat.created_at,
+        "messages": list_messages
+    }
+    return response
