@@ -34,7 +34,7 @@ async def create_message(chat_id:int, message: MessageORM, session: AsyncSession
     
 async def get_chat(chat_id:int, session: AsyncSession) -> Optional[Chat]:
     try:
-        stmt = select(Chat).where(Chat.chat_id == chat_id)
+        stmt = select(Chat).where(Chat.id == chat_id)
         chat = await session.execute(stmt)
         result = chat.scalars().first()
         return result
