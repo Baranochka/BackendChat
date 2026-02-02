@@ -18,10 +18,11 @@ async def create_chats(
 
 @router.post("/{id}/messages/")
 async def create_messages(
+    id: int,
     message: Message,
     session: AsyncSession = Depends(db_helper.session_getter)
 ):
-    result = await create_message(message=message, session=session)
+    result = await create_message(chat_id=id, message=message, session=session)
     if result is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
     return result
