@@ -32,13 +32,22 @@ async def create_message(chat_id:int, message: MessageORM, session: AsyncSession
         return None
     
     
+async def get_chat(chat_id:int, session: AsyncSession) -> Optional[Chat]:
+    try:
+        stmt = select(Chat).where(Chat.chat_id == chat_id)
+        chat = await session.execute(stmt)
+        result = chat.scalars().first()
+        return result
+    except IntegrityError:
+        await session.rollback()
+        return None
+        
+    
 async def get_list_messages(chat_id:int, limit: int, session: AsyncSession) -> Optional[List[Message]]:
     try:
         stmt = select(Message).where(Message.chat_id == chat_id).order_by(desc(Message.created_at)).limit(limit)
         messages = await session.execute(stmt)
         result = messages.scalars().all()
-        print(result)
-        
         return result
     except IntegrityError:
         await session.rollback()
