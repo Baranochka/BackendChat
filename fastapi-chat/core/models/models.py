@@ -1,7 +1,16 @@
 from .base import Base
-from sqlalchemy.orm import Mapped
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
+from typing import List
 
 class Chat(Base):
     title: Mapped[str]
+    created_at: Mapped[datetime]
+    messages: Mapped[List["Message"]] = relationship(back_populates="chat")
+    
+class Message(Base):
+    chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"))
+    chat: Mapped["Chat"] = relationship(back_populates="messages")
+    text: Mapped[str]
     created_at: Mapped[datetime]
