@@ -12,7 +12,7 @@ class RunConfig(BaseModel):
 
 
 class ApiPrefix(BaseModel):
-    prefix: str = "/api"
+    chats: str = "/chats"
 
 
 class DatabaseConfig(BaseModel):
