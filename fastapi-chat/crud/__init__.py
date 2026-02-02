@@ -1,2 +1,2 @@
-__all__=("create_chat",)
-from .chat import create_chat
+__all__=("create_chat", "create_message")
+from .chat import create_chat, create_message
