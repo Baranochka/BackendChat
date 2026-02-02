@@ -1,4 +1,4 @@
-from sqlalchemy import insert, and_
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
@@ -26,6 +26,17 @@ async def create_message(chat_id:int, message: MessageORM, session: AsyncSession
         session.add(messagecreate)
         await session.commit()
         return messagecreate
+    except IntegrityError:
+        await session.rollback()
+        return None
+    
+    
+async def get_message(chat_id:int, limit: int, session: AsyncSession) -> Optional[Message]:
+    try:
+        stmt = select(Chat).where(Chat.id==chat_id).joined("Messages")
+        messages = await session.scalars(stmt)
+        print(messages)
+        return messages
     except IntegrityError:
         await session.rollback()
         return None
