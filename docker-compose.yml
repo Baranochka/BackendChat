@@ -1,0 +1,10 @@
+services:
+
+  pg:
+    image: postgres
+    environment:
+      POSTGRES_DB: backendchats
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password 
+    ports:
+      - "5222:5432"
