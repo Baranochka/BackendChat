@@ -1,2 +1,2 @@
-__all__=("Chat",)
-from .chats import Chat
+__all__=("Chat", "Message")
+from .chats import Chat, Message
