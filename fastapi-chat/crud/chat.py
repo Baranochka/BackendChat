@@ -4,7 +4,7 @@ from typing import List, Optional
 from core.models import Chat, Message
 from core.schemas import Chat as ChatORM
 from core.schemas import Message as MessageORM
-from sqlalchemy import and_, desc, select
+from sqlalchemy import and_, desc, select, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -64,3 +64,18 @@ async def get_list_messages(
     except IntegrityError:
         await session.rollback()
         return None
+
+
+async def delete_chats_with_messages(
+    chat_id: int, session: AsyncSession
+) -> bool:
+    try:
+        # stmt = delete(Message).where(Message.chat_id==chat_id)
+        # await session.execute(stmt)
+        stmt = delete(Chat).where(Chat.id==chat_id)
+        await session.execute(stmt)
+        await session.commit()
+        return True
+    except IntegrityError:
+        await session.rollback()
+        return False
