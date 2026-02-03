@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from core.models import Chat, Message
-from core.schemas import Chat as ChatORM
-from core.schemas import Message as MessageORM
-from sqlalchemy import and_, desc, select, delete
+from sqlalchemy import and_, delete, desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from core.models import Chat, Message
+from core.schemas import Chat as ChatORM
+from core.schemas import Message as MessageORM
 
 
 async def create_chat(chat: ChatORM, session: AsyncSession) -> Optional[Chat]:
@@ -66,11 +67,9 @@ async def get_list_messages(
         return None
 
 
-async def delete_chats_with_messages(
-    chat_id: int, session: AsyncSession
-) -> bool:
+async def delete_chats_with_messages(chat_id: int, session: AsyncSession) -> bool:
     try:
-        stmt = delete(Chat).where(Chat.id==chat_id)
+        stmt = delete(Chat).where(Chat.id == chat_id)
         await session.execute(stmt)
         await session.commit()
         return True
