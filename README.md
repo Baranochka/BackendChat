@@ -27,3 +27,20 @@
 - ___Docker___
 
 - Ассинхронная обработка запросов
+
+### Запуск
+-------------
+#### Клонировать репозиторий
+```bash
+git clone https://github.com/Baranochka/BackendChat.git
+```
+
+#### Перейти в директорию
+```bash
+cd BackendChat
+```
+
+#### Запустить docker-compose
+```bash
+docker compose up --build
+```
