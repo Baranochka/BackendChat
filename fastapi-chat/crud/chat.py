@@ -70,8 +70,6 @@ async def delete_chats_with_messages(
     chat_id: int, session: AsyncSession
 ) -> bool:
     try:
-        # stmt = delete(Message).where(Message.chat_id==chat_id)
-        # await session.execute(stmt)
         stmt = delete(Chat).where(Chat.id==chat_id)
         await session.execute(stmt)
         await session.commit()
