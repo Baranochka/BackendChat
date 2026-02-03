@@ -4,14 +4,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY pyproject.toml uv.lock prestart.sh ./
+COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --no-cache
 
-COPY fastapi-chat ./fastapi-chat
+COPY fastapi-chat .
 
 RUN chmod +x prestart.sh
 
 ENTRYPOINT [ "./prestart.sh" ]
 
-CMD ["uv", "run", "fastapi-chat/main.py"]
+CMD ["uv", "run", "main.py"]
