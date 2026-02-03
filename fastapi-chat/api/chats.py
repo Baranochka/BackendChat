@@ -3,7 +3,7 @@ from typing import Optional
 from core import settings
 from core.models import db_helper
 from core.schemas import Chat, Message
-from crud import create_chat, create_message, get_chat, get_list_messages
+from crud import create_chat, create_message, get_chat, get_list_messages, delete_chats_with_messages
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -67,3 +67,17 @@ async def get_messages(
         "messages": list_messages,
     }
     return response
+
+
+@router.delete("/{id}")
+async def delete_chats(
+    id: int,
+    session: AsyncSession = Depends(db_helper.session_getter),
+):
+    result = await delete_chats_with_messages(chat_id=id, session=session,)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        )
+    return {"Responces": "Chat delete"}
