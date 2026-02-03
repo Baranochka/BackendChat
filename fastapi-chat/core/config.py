@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class RunConfig(BaseModel):
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: str = 8000
 
 
