@@ -28,6 +28,11 @@ async def create_chats(
 async def create_messages(
     id: int, message: Message, session: AsyncSession = Depends(db_helper.session_getter)
 ):
+    chat = await get_chat(chat_id=id, session=session)
+   
+    if not chat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    
     result = await create_message(chat_id=id, message=message, session=session)
     if result is None:
         raise HTTPException(
@@ -48,7 +53,10 @@ async def get_messages(
     session: AsyncSession = Depends(db_helper.session_getter),
 ):
     chat = await get_chat(chat_id=id, session=session)
-
+   
+    if not chat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    
     result = await get_list_messages(chat_id=id, limit=limit, session=session)
     list_messages = []
     for message in result:
