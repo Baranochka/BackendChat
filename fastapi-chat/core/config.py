@@ -23,7 +23,6 @@ class DatabaseConfig(BaseModel):
     max_overflow: int = 10
 
 
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(

@@ -1,3 +1,2 @@
-__all__=("router",)
-from .chats import router 
-
+__all__ = ("router",)
+from .chats import router

@@ -1,12 +1,14 @@
-from sqlalchemy import select, and_, desc
-from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
+from typing import List, Optional
+
+from core.models import Chat, Message
 from core.schemas import Chat as ChatORM
 from core.schemas import Message as MessageORM
-from core.models import Chat, Message
-from typing import Optional, List
+from sqlalchemy import and_, desc, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 
 async def create_chat(chat: ChatORM, session: AsyncSession) -> Optional[Chat]:
     try:
@@ -18,8 +20,11 @@ async def create_chat(chat: ChatORM, session: AsyncSession) -> Optional[Chat]:
     except IntegrityError:
         await session.rollback()
         return None
-    
-async def create_message(chat_id:int, message: MessageORM, session: AsyncSession) -> Optional[Message]:
+
+
+async def create_message(
+    chat_id: int, message: MessageORM, session: AsyncSession
+) -> Optional[Message]:
     try:
         messagecreate = Message(**message.model_dump())
         messagecreate.created_at = datetime.now(timezone.utc)
@@ -30,9 +35,9 @@ async def create_message(chat_id:int, message: MessageORM, session: AsyncSession
     except IntegrityError:
         await session.rollback()
         return None
-    
-    
-async def get_chat(chat_id:int, session: AsyncSession) -> Optional[Chat]:
+
+
+async def get_chat(chat_id: int, session: AsyncSession) -> Optional[Chat]:
     try:
         stmt = select(Chat).where(Chat.id == chat_id)
         chat = await session.execute(stmt)
@@ -41,11 +46,18 @@ async def get_chat(chat_id:int, session: AsyncSession) -> Optional[Chat]:
     except IntegrityError:
         await session.rollback()
         return None
-        
-    
-async def get_list_messages(chat_id:int, limit: int, session: AsyncSession) -> Optional[List[Message]]:
+
+
+async def get_list_messages(
+    chat_id: int, limit: int, session: AsyncSession
+) -> Optional[List[Message]]:
     try:
-        stmt = select(Message).where(Message.chat_id == chat_id).order_by(desc(Message.created_at)).limit(limit)
+        stmt = (
+            select(Message)
+            .where(Message.chat_id == chat_id)
+            .order_by(desc(Message.created_at))
+            .limit(limit)
+        )
         messages = await session.execute(stmt)
         result = messages.scalars().all()
         return result

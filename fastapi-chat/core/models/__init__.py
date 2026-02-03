@@ -4,6 +4,6 @@ __all__ = (
     "Chat",
     "Message",
 )
-from .db_helper import db_helper
 from .base import Base
 from .chat import Chat, Message
+from .db_helper import db_helper
