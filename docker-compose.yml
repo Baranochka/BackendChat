@@ -1,6 +1,5 @@
 services:
-
-  pg:
+  pg2:
     image: postgres
     environment:
       POSTGRES_DB: backendchats
@@ -8,3 +7,14 @@ services:
       POSTGRES_PASSWORD: password 
     ports:
       - "5222:5432"
+  app:
+
+    env_file:
+        - fastapi-chat/.env.template
+    build:
+      dockerfile: ./docker-build/Dockerfile
+      context: ./
+    ports:
+      - "8000:8000"
+      
+    
