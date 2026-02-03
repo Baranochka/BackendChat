@@ -1,7 +1,6 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import settings
@@ -15,37 +14,56 @@ from crud import (
     get_list_messages,
 )
 
-router = APIRouter(prefix=settings.api.chats)
+router = APIRouter(
+    prefix=settings.api.chats,
+)
 
 
 @router.post("/")
 async def create_chats(
-    chat: Chat, session: AsyncSession = Depends(db_helper.session_getter)
+    chat: Chat,
+    session: AsyncSession = Depends(db_helper.session_getter),
 ):
-    result = await create_chat(chat=chat, session=session)
+    result = await create_chat(
+        chat=chat,
+        session=session,
+    )
+
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
         )
+
     return result
 
 
 @router.post("/{id}/messages/")
 async def create_messages(
-    id: int, message: Message, session: AsyncSession = Depends(db_helper.session_getter)
+    id: int,
+    message: Message,
+    session: AsyncSession = Depends(db_helper.session_getter),
 ):
     chat = await get_chat(chat_id=id, session=session)
 
     if not chat:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Not found",
+        )
 
-    result = await create_message(chat_id=id, message=message, session=session)
+    result = await create_message(
+        chat_id=id,
+        message=message,
+        session=session,
+    )
+
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
         )
+
     return result
 
 
@@ -59,13 +77,25 @@ async def get_messages(
     ),
     session: AsyncSession = Depends(db_helper.session_getter),
 ):
-    chat = await get_chat(chat_id=id, session=session)
+    chat = await get_chat(
+        chat_id=id,
+        session=session,
+    )
 
     if not chat:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Not found",
+        )
 
-    result = await get_list_messages(chat_id=id, limit=limit, session=session)
+    result = await get_list_messages(
+        chat_id=id,
+        limit=limit,
+        session=session,
+    )
+
     list_messages = []
+
     for message in result:
         list_messages.append(
             {
@@ -74,6 +104,7 @@ async def get_messages(
                 "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )
+
     response = {
         "Chat": "",
         "id": chat.id,
@@ -81,6 +112,7 @@ async def get_messages(
         "created_at": chat.created_at,
         "messages": list_messages,
     }
+
     return response
 
 
@@ -93,9 +125,11 @@ async def delete_chats(
         chat_id=id,
         session=session,
     )
+
     if not result:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
         )
+
     return {"Responces": "Chat delete"}
